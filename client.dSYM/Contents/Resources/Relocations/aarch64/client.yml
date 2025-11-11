@@ -1,0 +1,11 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     client
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003BFC, symSize: 0xD8 }
+  - { offsetInCU: 0x109, offset: 0x109, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003BFC, symSize: 0xD8 }
+  - { offsetInCU: 0x21A, offset: 0x21A, size: 0x8, addend: 0x0, symName: __ZL5queryiPKc, symObjAddr: 0xD8, symBinAddr: 0x100003CD4, symSize: 0x184 }
+  - { offsetInCU: 0x4C6, offset: 0x4C6, size: 0x8, addend: 0x0, symName: __ZL5queryiPKc.cold.1, symObjAddr: 0x25C, symBinAddr: 0x100003E58, symSize: 0x28 }
+  - { offsetInCU: 0x4F2, offset: 0x4F2, size: 0x8, addend: 0x0, symName: __ZL5queryiPKc.cold.3, symObjAddr: 0x2AC, symBinAddr: 0x100003EA8, symSize: 0x28 }
+  - { offsetInCU: 0x51E, offset: 0x51E, size: 0x8, addend: 0x0, symName: __ZL5queryiPKc.cold.2, symObjAddr: 0x284, symBinAddr: 0x100003E80, symSize: 0x28 }
+...
