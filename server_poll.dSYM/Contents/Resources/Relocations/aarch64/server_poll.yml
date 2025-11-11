@@ -1,0 +1,10 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     server_poll
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003A24, symSize: 0x3D8 }
+  - { offsetInCU: 0x24A, offset: 0x24A, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003A24, symSize: 0x3D8 }
+  - { offsetInCU: 0x772, offset: 0x772, size: 0x8, addend: 0x0, symName: _main.cold.1, symObjAddr: 0x3D8, symBinAddr: 0x100003DFC, symSize: 0x28 }
+  - { offsetInCU: 0x7B3, offset: 0x7B3, size: 0x8, addend: 0x0, symName: _main.cold.2, symObjAddr: 0x400, symBinAddr: 0x100003E24, symSize: 0x28 }
+  - { offsetInCU: 0x7F4, offset: 0x7F4, size: 0x8, addend: 0x0, symName: _main.cold.3, symObjAddr: 0x428, symBinAddr: 0x100003E4C, symSize: 0x28 }
+...
