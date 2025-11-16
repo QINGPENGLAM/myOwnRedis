@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 struct HNode {
-    HNode*    next = nullptr;
+    HNode*    next  = nullptr;
     uint64_t  hcode = 0;    // precomputed hash
 };
 
@@ -15,27 +15,29 @@ struct HTab {
     size_t  size = 0;       // number of nodes
 };
 
+typedef bool (*h_eq_fn)(HNode*, HNode*);
+
+// basic table helpers
+void   h_init(HTab* ht, size_t n);
+void   h_destroy(HTab* ht);
+HNode* h_detach(HTab* ht, HNode** from);
+HNode** h_lookup(HTab* ht, HNode* key, h_eq_fn eq);
+void   h_insert(HTab* ht, HNode* node);
+
+// incremental rehashing map
 struct HMap {
-    HTab   newer{};         // active table
-    HTab   older{};         // migrating-from table
-    size_t migrate_pos = 0; // next slot to migrate
+    HTab   newer;
+    HTab   older;
+    size_t resizing_pos = 0;
 };
 
-// Intrusive equality callback signature
-using h_eq_fn = bool(*)(HNode*, HNode*);
+void   hm_init(HMap* hmap);
+void   hm_destroy(HMap* hmap);
+void   hm_insert(HMap* hmap, HNode* node);
+HNode* hm_lookup(HMap* hmap, HNode* key, h_eq_fn eq);
+HNode* hm_delete(HMap* hmap, HNode* key, h_eq_fn eq);
 
-// Public API
-void     h_init(HTab* ht, size_t n);                 // n must be power of 2
-void     h_insert(HTab* ht, HNode* node);
-HNode**  h_lookup(HTab* ht, HNode* key, h_eq_fn eq); // returns &incoming_ptr
-HNode*   h_detach(HTab* ht, HNode** from);
-
-void     hm_init(HMap* hmap);                        // optional helper
-HNode*   hm_lookup(HMap* hmap, HNode* key, h_eq_fn eq);
-void     hm_insert(HMap* hmap, HNode* node);
-HNode*   hm_delete(HMap* hmap, HNode* key, h_eq_fn eq);
-
-// 64-bit FNV-1a hash for byte spans
+// FNV-1a hash for strings
 static inline uint64_t str_hash(const uint8_t* p, size_t n) {
     const uint64_t FNV_OFFSET = 1469598103934665603ull;
     const uint64_t FNV_PRIME  = 1099511628211ull;
@@ -47,6 +49,8 @@ static inline uint64_t str_hash(const uint8_t* p, size_t n) {
     return h;
 }
 
-// Standard intrusive helper
+// Standard intrusive helper if not already defined
+#ifndef container_of
 #define container_of(ptr, T, member) \
     ((T*)((char*)(ptr) - offsetof(T, member)))
+#endif

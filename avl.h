@@ -13,16 +13,23 @@ struct AVLNode {
     AVLNode *left   = nullptr;
     AVLNode *right  = nullptr;
     uint32_t height = 0;   // 0 for null, 1 for leaf
+    uint32_t cnt    = 0;   // subtree size (order statistic)
 };
 
 inline void avl_init(AVLNode *n) {
     n->parent = n->left = n->right = nullptr;
     n->height = 1;
+    n->cnt    = 1;
 }
+
 inline uint32_t avl_height(AVLNode *n) { return n ? n->height : 0u; }
+inline uint32_t avl_cnt   (AVLNode *n) { return n ? n->cnt    : 0u; }
+
 inline void avl_update(AVLNode *n) {
-    uint32_t hl = avl_height(n->left), hr = avl_height(n->right);
+    uint32_t hl = avl_height(n->left);
+    uint32_t hr = avl_height(n->right);
     n->height = 1u + (hl > hr ? hl : hr);
+    n->cnt    = 1u + avl_cnt(n->left) + avl_cnt(n->right);
 }
 
 // Rotations (return new subtree root; caller fixes parent link)
@@ -48,3 +55,14 @@ AVLNode* avl_search_and_delete(AVLNode **root,
 // In-order iteration
 AVLNode* avl_first(AVLNode *root);
 AVLNode* avl_next(AVLNode *n);
+
+// Verification (used by test_avl)
+bool     verify_avl(AVLNode *root);
+
+// Order-statistic helpers (Chapter 11)
+// Offset from `node` by `offset` positions in sorted order (0 = same node).
+// Returns nullptr if going out of range.
+AVLNode* avl_offset(AVLNode *node, int64_t offset);
+
+// Return 0-based rank of `node` in sorted order. Returns -1 if node is null.
+int64_t  avl_rank(AVLNode *node);

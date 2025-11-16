@@ -7,8 +7,10 @@ AVLNode* avl_rot_left(AVLNode *x) {
     if (!y) return x;
     AVLNode *B = y->left;
 
-    y->left = x;     x->parent = y;
-    x->right = B;    if (B) B->parent = x;
+    y->left = x;
+    x->parent = y;
+    x->right = B;
+    if (B) B->parent = x;
     y->parent = p;
 
     avl_update(x);
@@ -22,8 +24,10 @@ AVLNode* avl_rot_right(AVLNode *y) {
     if (!x) return y;
     AVLNode *B = x->right;
 
-    x->right = y;    y->parent = x;
-    y->left  = B;    if (B) B->parent = y;
+    x->right = y;
+    y->parent = x;
+    y->left = B;
+    if (B) B->parent = y;
     x->parent = p;
 
     avl_update(y);
@@ -35,7 +39,8 @@ AVLNode* avl_fix_left(AVLNode *n) {
     if (avl_height(n->left->left) < avl_height(n->left->right)) {
         AVLNode *L = n->left;
         AVLNode *L2 = avl_rot_left(L);
-        n->left = L2; L2->parent = n;
+        n->left = L2;
+        L2->parent = n;
     }
     return avl_rot_right(n);
 }
@@ -44,7 +49,8 @@ AVLNode* avl_fix_right(AVLNode *n) {
     if (avl_height(n->right->right) < avl_height(n->right->left)) {
         AVLNode *R = n->right;
         AVLNode *R2 = avl_rot_right(R);
-        n->right = R2; R2->parent = n;
+        n->right = R2;
+        R2->parent = n;
     }
     return avl_rot_left(n);
 }
@@ -52,10 +58,12 @@ AVLNode* avl_fix_right(AVLNode *n) {
 AVLNode* avl_fix(AVLNode *n) {
     while (n) {
         AVLNode *parent = n->parent;
-        AVLNode **from = parent ? (parent->left == n ? &parent->left : &parent->right) : &n;
+        AVLNode **from = parent ?
+            (parent->left == n ? &parent->left : &parent->right) : &n;
 
         avl_update(n);
-        uint32_t hl = avl_height(n->left), hr = avl_height(n->right);
+        uint32_t hl = avl_height(n->left);
+        uint32_t hr = avl_height(n->right);
         if (hl == hr + 2) {
             *from = avl_fix_left(n);
             (*from)->parent = parent;
@@ -64,18 +72,22 @@ AVLNode* avl_fix(AVLNode *n) {
             (*from)->parent = parent;
         }
 
-        if (!parent) return *from; // reached root; return new root
+        if (!parent) return *from;
         n = parent;
     }
     return nullptr;
 }
 
 static AVLNode* avl_del_easy(AVLNode *node) {
-    AVLNode *child  = node->left ? node->left : node->right; // may be null
+    AVLNode *child  = node->left ? node->left : node->right;
     AVLNode *parent = node->parent;
 
     if (child) child->parent = parent;
-    if (!parent) { if (child) avl_update(child); return child; }
+
+    if (!parent) {
+        if (child) avl_update(child);
+        return child;
+    }
 
     AVLNode **from = (parent->left == node) ? &parent->left : &parent->right;
     *from = child;
@@ -87,25 +99,29 @@ AVLNode* avl_del(AVLNode *node) {
         return avl_del_easy(node);
     }
 
-    // successor: leftmost of right subtree
+    // successor = leftmost of right subtree
     AVLNode *s = node->right;
     while (s->left) s = s->left;
 
-    // detach successor (easy case) – returns new root after removal
-    AVLNode *root = avl_del_easy(s);
+    // Detach successor (simple case)
+    AVLNode *root_after = avl_del_easy(s);
 
-    // move node's children/parent onto s
-    s->left  = node->left;   if (s->left)  s->left->parent  = s;
-    s->right = node->right;  if (s->right) s->right->parent = s;
+    // Move node's children/parent onto s
+    s->left  = node->left;
+    if (s->left) s->left->parent = s;
+    s->right = node->right;
+    if (s->right) s->right->parent = s;
     s->parent = node->parent;
 
     if (!s->parent) {
         avl_update(s);
         return avl_fix(s);
     } else {
-        AVLNode **from = (s->parent->left == node) ? &s->parent->left : &s->parent->right;
+        AVLNode **from = (s->parent->left == node)
+            ? &s->parent->left : &s->parent->right;
         *from = s;
         avl_update(s);
+        (void)root_after;  // root_after is same tree, but avl_fix will walk up
         return avl_fix(s);
     }
 }
@@ -119,12 +135,17 @@ void avl_search_and_insert(AVLNode **root, AVLNode *new_node,
 
     while (cur) {
         parent = cur;
-        if (less(new_node, cur)) { from = &cur->left;  cur = cur->left;  }
-        else                      { from = &cur->right; cur = cur->right; }
+        if (less(new_node, cur)) {
+            from = &cur->left;
+            cur  = cur->left;
+        } else {
+            from = &cur->right;
+            cur  = cur->right;
+        }
     }
+
     *from = new_node;
     new_node->parent = parent;
-
     *root = avl_fix(new_node);
 }
 
@@ -133,8 +154,8 @@ AVLNode* avl_search_and_delete(AVLNode **root,
     AVLNode *cur = *root;
     while (cur) {
         int32_t r = cmp(cur, key);
-        if (r < 0)       cur = cur->right;
-        else if (r > 0)  cur = cur->left;
+        if (r < 0)      cur = cur->right;
+        else if (r > 0) cur = cur->left;
         else {
             AVLNode *victim = cur;
             *root = avl_del(cur);
@@ -159,6 +180,85 @@ AVLNode* avl_next(AVLNode *n) {
         return n;
     }
     AVLNode *p = n->parent;
-    while (p && p->right == n) { n = p; p = p->parent; }
+    while (p && p->right == n) {
+        n = p;
+        p = p->parent;
+    }
     return p;
+}
+
+// ------------ Simple verifier used by test_avl ------------
+
+static bool verify_rec(AVLNode *n, int &height_out, uint32_t &cnt_out) {
+    if (!n) {
+        height_out = 0;
+        cnt_out    = 0;
+        return true;
+    }
+    int hl, hr;
+    uint32_t cl, cr;
+    if (!verify_rec(n->left, hl, cl))  return false;
+    if (!verify_rec(n->right, hr, cr)) return false;
+
+    int h = 1 + (hl > hr ? hl : hr);
+    uint32_t c = 1u + cl + cr;
+    if ((int)n->height != h) return false;
+    if (n->cnt != c)         return false;
+
+    int diff = hl - hr;
+    if (diff < -1 || diff > 1) return false;
+
+    height_out = h;
+    cnt_out    = c;
+    return true;
+}
+
+bool verify_avl(AVLNode *root) {
+    int h = 0;
+    uint32_t c = 0;
+    return verify_rec(root, h, c);
+}
+
+// ------------ Order statistic helpers (Chapter 11) ------------
+
+AVLNode* avl_offset(AVLNode *node, int64_t offset) {
+    if (!node) return nullptr;
+    int64_t pos = 0;    // rank difference from starting node (0 = self)
+
+    while (offset != pos && node) {
+        if (pos < offset && pos + (int64_t)avl_cnt(node->right) >= offset) {
+            // target is inside the right subtree
+            node = node->right;
+            pos += (int64_t)avl_cnt(node->left) + 1;
+        } else if (pos > offset && pos - (int64_t)avl_cnt(node->left) <= offset) {
+            // target is inside the left subtree
+            node = node->left;
+            pos -= (int64_t)avl_cnt(node->right) + 1;
+        } else {
+            // go to parent
+            AVLNode *parent = node->parent;
+            if (!parent) return nullptr;
+            if (parent->right == node) {
+                pos -= (int64_t)avl_cnt(node->left) + 1;
+            } else {
+                pos += (int64_t)avl_cnt(node->right) + 1;
+            }
+            node = parent;
+        }
+    }
+    return (offset == pos) ? node : nullptr;
+}
+
+int64_t avl_rank(AVLNode *node) {
+    if (!node) return -1;
+    int64_t r = (int64_t)avl_cnt(node->left);  // all left-subtree nodes < node
+    while (node->parent) {
+        AVLNode *p = node->parent;
+        if (p->right == node) {
+            // all nodes in parent's left subtree and parent itself < node
+            r += (int64_t)avl_cnt(p->left) + 1;
+        }
+        node = p;
+    }
+    return r;  // 0-based
 }
