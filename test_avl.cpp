@@ -71,7 +71,6 @@ int main() {
     }
     assert(verify_avl(root));
 
-    // print first 10 keys
     int cnt = 0;
     for (AVLNode *it = avl_first(root); it && cnt < 10; it = avl_next(it), ++cnt) {
         int k = container_of(it, Item, node)->key;
