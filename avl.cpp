@@ -187,37 +187,7 @@ AVLNode* avl_next(AVLNode *n) {
     return p;
 }
 
-// ------------ Simple verifier used by test_avl ------------
 
-static bool verify_rec(AVLNode *n, int &height_out, uint32_t &cnt_out) {
-    if (!n) {
-        height_out = 0;
-        cnt_out    = 0;
-        return true;
-    }
-    int hl, hr;
-    uint32_t cl, cr;
-    if (!verify_rec(n->left, hl, cl))  return false;
-    if (!verify_rec(n->right, hr, cr)) return false;
-
-    int h = 1 + (hl > hr ? hl : hr);
-    uint32_t c = 1u + cl + cr;
-    if ((int)n->height != h) return false;
-    if (n->cnt != c)         return false;
-
-    int diff = hl - hr;
-    if (diff < -1 || diff > 1) return false;
-
-    height_out = h;
-    cnt_out    = c;
-    return true;
-}
-
-bool verify_avl(AVLNode *root) {
-    int h = 0;
-    uint32_t c = 0;
-    return verify_rec(root, h, c);
-}
 
 // ------------ Order statistic helpers (Chapter 11) ------------
 

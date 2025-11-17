@@ -56,9 +56,6 @@ AVLNode* avl_search_and_delete(AVLNode **root,
 AVLNode* avl_first(AVLNode *root);
 AVLNode* avl_next(AVLNode *n);
 
-// Verification (used by test_avl)
-bool     verify_avl(AVLNode *root);
-
 // Order-statistic helpers (Chapter 11)
 // Offset from `node` by `offset` positions in sorted order (0 = same node).
 // Returns nullptr if going out of range.
