@@ -225,7 +225,6 @@ int64_t avl_rank(AVLNode *node) {
     while (node->parent) {
         AVLNode *p = node->parent;
         if (p->right == node) {
-            // all nodes in parent's left subtree and parent itself < node
             r += (int64_t)avl_cnt(p->left) + 1;
         }
         node = p;
