@@ -72,7 +72,6 @@ static int32_t send_req(int fd, const std::vector<std::string> &cmd) {
 }
 
 static int32_t read_res(int fd) {
-    // 4 bytes header
     char rbuf[4 + k_max_msg];
     errno = 0;
     int32_t err = read_full(fd, rbuf, 4);
