@@ -84,7 +84,7 @@ static int32_t read_res(int fd) {
         return err;
     }
     uint32_t len = 0;
-    memcpy(&len, rbuf, 4);  // assume little endian
+    memcpy(&len, rbuf, 4);  
     if (len > k_max_msg) {
         msg("too long");
         return -1;
