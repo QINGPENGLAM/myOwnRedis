@@ -56,9 +56,6 @@ AVLNode* avl_search_and_delete(AVLNode **root,
 AVLNode* avl_first(AVLNode *root);
 AVLNode* avl_next(AVLNode *n);
 
-// Order-statistic helpers (Chapter 11)
-// Offset from `node` by `offset` positions in sorted order (0 = same node).
-// Returns nullptr if going out of range.
 AVLNode* avl_offset(AVLNode *node, int64_t offset);
 
 // Return 0-based rank of `node` in sorted order. Returns -1 if node is null.
